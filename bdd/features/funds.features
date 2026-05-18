@@ -1,0 +1,138 @@
+### **Feature: Haveno-Web Funds**
+
+#### **Background:**
+These scenarios cover the essential funds operations for the Haveno-Web application, providing a comprehensive outline of the functionality related to balance management, address handling, wallet security, transaction creation, and viewing.
+
+As per main.features:
+**And** the app is already open on the Funds (initial) page
+**And** the application is connected to the Haveno api (running either on the device or server (Envoy))
+
+---
+
+#### **Scenario 1: Accessing the Funds page with primary Xmr wallet address and balance data**
+
+**Given** the Funds page is open
+**When** balances are fetched
+**Then** it has status as Loaded
+**And** pagetitle is Funds
+**And** it should display primary Xmr address
+**And** it should display xmrbalance
+**And** it should display btcbalance
+**And** it should display reservedOfferBalance 
+
+---
+
+#### **Scenario 2: Show available balance and reserved balance correctly in the UI**
+
+**Given** the Funds page is open  
+**When** the app retrieves the current balance information  
+**Then** the Funds page displays the Available, Pending, and Reserved Balances  
+
+---
+
+#### **Scenario 3: Generating a New Subaddress**
+
+**Given** the hardware device is connected  
+**When** the user requests a new subaddress  
+**Then** the app generates a new Monero subaddress using `Wallet.GotNewSubaddress`  
+**And** the new subaddress is displayed to the user  
+
+---
+
+#### **Scenario 4: Retrieving the Primary Address**
+
+**Given** the Funds page is open  
+**And** the hardware device is connected  
+**When** the app retrieves the primary Monero address using `Wallet.GotPrimaryAddress`  
+**Then** the primary address is displayed on the Funds page  
+
+---
+
+#### **Scenario 5: Checking Address Balance**
+
+**Given** a Monero address is available  
+**When** the app queries the balance for the address using `Wallet.GotAddressBalance`  
+**Then** the balance for the specific address is displayed on the Funds page  
+
+---
+
+#### **Scenario 6: Viewing Funding Addresses**
+
+**Given** the Funds page is open  
+**When** the app retrieves available funding addresses using `Wallet.GotFundingAddresses`  
+**Then** all funding addresses are displayed on the Funds page  
+
+---
+
+#### **Scenario 7: Unlocking the Wallet**
+
+**Given** the Funds page is open  
+**And** the wallet is currently locked  
+**When** the user attempts to unlock the wallet  
+**Then** the app sends an `Wallet.GotUnlockWallet` request  
+**And** the Funds page updates to reflect the unlocked state  
+
+---
+
+#### **Scenario 8: Locking the Wallet**
+
+**Given** the Funds page is open  
+**And** the wallet is currently unlocked  
+**When** the user requests to lock the wallet  
+**Then** the app sends a `Wallet.GotLockWallet` request  
+**And** the Funds page updates to reflect the locked state  
+
+---
+
+#### **Scenario 9: Setting a Wallet Password**
+
+**Given** the Funds page is open  
+**When** the user sets a password for the wallet  
+**Then** the app sends a `Wallet.GotSetWalletPassword` request  
+**And** the Funds page confirms that the password was successfully set  
+
+---
+
+#### **Scenario 10: Removing the Wallet Password**
+
+**Given** the Funds page is open  
+**And** the wallet has a password set  
+**When** the user removes the wallet password  
+**Then** the app sends a `Wallet.GotRemoveWalletPassword` request  
+**And** the Funds page confirms the password was successfully removed  
+
+---
+
+#### **Scenario 11: Relaying a Monero Transaction**
+
+**Given** the user has created a transaction  
+**When** the user requests to relay the transaction  
+**Then** the app sends a `Wallet.GotRelayTransaction` request  
+**And** the transaction is broadcast to the Monero network  
+
+---
+
+#### **Scenario 12: Creating a New Monero Transaction**
+
+**Given** the Funds page is open  
+**When** the user initiates a new transaction  
+**Then** the app sends a `Wallet.GotCreateTransaction` request with transaction details  
+**And** the Funds page displays the pending transaction status  
+
+---
+
+#### **Scenario 13: Viewing Monero Transactions**
+
+**Given** the Funds page is open  
+**When** the user requests to view recent transactions  
+**Then** the app retrieves the transactions using `Wallet.GotXmrTxs`  
+**And** the transaction history is displayed on the Funds page  
+
+---
+
+#### **Scenario 14: Retrieving Wallet Seed**
+
+**Given** the Funds page is open  
+**When** the user requests to view the wallet seed  
+**Then** the app sends a `Wallet.GotXmrSeed` request  
+**And** the wallet seed is securely displayed to the user

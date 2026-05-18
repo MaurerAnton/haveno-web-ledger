@@ -1,0 +1,28 @@
+# elm-package generated files
+elm-stuff/
+# elm-repl generated files
+repl-temp-*
+project/*
+resources/Video/*
+proxy/node_modules
+node_modules
+pwa/android/*
+Docs/*
+
+# Ignore everything in the dist folder
+dist/*
+
+# Do not ignore the assets/resources/images folder and its contents
+!dist/assets/
+!dist/assets/resources/
+!dist/assets/resources/images/
+!dist/assets/resources/images/**
+
+package-lock.json
+.parcel-cache
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

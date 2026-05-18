@@ -1,0 +1,103 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.menu-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  padding: 10px 15px;
+  background-color: #333;
+  color: white;
+  border: none;
+  cursor: pointer;
+  z-index: 1100;
+  font-size: 24px; /* Increased font size for the burger and x icons */
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  transition: all 1s ease-in-out; /* Increased transition time */
+}
+
+.menu-btn_burger {
+  position: relative; /* Crucial for pseudo-elements */
+  width: 50px;
+  height: 6px;
+  background: white;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 9, 92, 0.8);
+  transition: all 1s ease-in-out; /* Increased transition time */
+  margin-left: 10px; /* Adjust this value for more/less space */
+}
+
+.menu-btn_burger::before,
+.menu-btn_burger::after {
+  content: '';
+  position: absolute; /* Positioned relative to .menu-btn_burger */
+  width: 50px;
+  height: 6px;
+  background: white;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 9, 92, 0.8);
+  transition: all 1s ease-in-out; /* Increased transition time */
+}
+
+.menu-btn_burger::before {
+  transform: translateY(-16px); /* Position above the main line */
+}
+
+.menu-btn_burger::after {
+  transform: translateY(16px); /* Position below the main line */
+}
+
+/* Animation for the open state */
+.menu-btn.open .menu-btn_burger {
+  background: transparent;
+  box-shadow: none;
+}
+
+.menu-btn.open .menu-btn_burger::before {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.menu-btn.open .menu-btn_burger::after {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+.menu {
+  position: fixed;
+  top: 0;
+  left: -250px; /* Start hidden off-screen */
+  width: 250px;
+  height: 100%;
+  background-color: #333;
+  color: white;
+  transition: left 0.6s ease; /* Increased transition time */
+  z-index: 1000;
+  overflow-y: auto; /* Add scrolling for long menus */
+}
+
+.menu.open {
+  left: 0; /* Slide menu into view */
+}
+
+.menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 20px 0;
+}
+
+.menu ul li {
+  padding: 10px 20px;
+  border-bottom: 1px solid #444;
+}
+
+.menu ul li a {
+  text-decoration: none;
+  color: white;
+}
+
+.menu ul li a:hover {
+  color: #00aced; /* Highlight on hover */
+}

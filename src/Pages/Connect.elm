@@ -1,0 +1,228 @@
+module Pages.Connect exposing (Model, Msg(..), init, initialModel, update, view)
+
+import Comms.CustomGrpc exposing (gotPrimaryAddress)
+import Grpc
+import Html exposing (Html, button, div, h1, h2, input, p, text, span)
+import Html.Attributes exposing (class, id, placeholder, style)
+import Html.Events exposing (onClick, onInput)
+import Proto.Io.Haveno.Protobuffer as Protobuf
+import Utils.MyUtils
+
+
+
+-- NAV: Model
+
+
+type alias Model =
+    { moneroNode : String -- Currently active Monero node
+    , customMoneroNode : String -- User-entered node before applying
+    , havenoConnected : Bool
+    , walletConnected : Bool
+    , retryingWallet : Bool
+    , retryingHaveno : Bool
+    , connectionAttempts : Int
+    , primaryaddress : String
+    , ledgerConnected : Bool
+    , ledgerConnecting : Bool
+    , ledgerError : String
+    }
+
+
+
+-- Messages for user actions
+
+
+type Msg
+    = RetryWalletConnection (Result Grpc.Error Protobuf.GetXmrPrimaryAddressReply)
+    | RetryHavenoConnection
+    | SetCustomMoneroNode String
+    | ApplyCustomMoneroNode
+      -- Ledger hardware wallet messages
+    | ConnectLedger
+    | LedgerConnected
+    | LedgerDisconnected
+    | LedgerConnectionFailed String
+    | DisconnectLedger
+    | RequestLedgerAddress
+    | LedgerAddressReceived String
+
+
+initialModel : Model
+initialModel =
+    { moneroNode = "node.haveno.network:17750"
+    , customMoneroNode = ""
+    , havenoConnected = False
+    , walletConnected = False
+    , retryingWallet = False
+    , retryingHaveno = False
+    , connectionAttempts = 0
+    , primaryaddress = ""
+    , ledgerConnected = False
+    , ledgerConnecting = False
+    , ledgerError = ""
+    }
+
+
+
+-- NAV: Init
+
+
+init : () -> ( Model, Cmd Msg )
+init _ =
+    ( initialModel
+    , Cmd.none
+    )
+
+
+
+-- Update function
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        RetryWalletConnection (Ok primaryAddresponse) ->
+            ( { model | retryingWallet = False, connectionAttempts = model.connectionAttempts, primaryaddress = primaryAddresponse.primaryAddress, walletConnected = True }, Cmd.none )
+
+        RetryWalletConnection (Err _) ->
+            ( { model | retryingWallet = True, connectionAttempts = model.connectionAttempts + 1 }, gotPrimaryAddress |> Grpc.toCmd RetryWalletConnection )
+
+        RetryHavenoConnection ->
+            ( { model | retryingHaveno = True }, Cmd.none )
+
+        SetCustomMoneroNode node ->
+            ( { model | customMoneroNode = node }, Cmd.none )
+
+        ApplyCustomMoneroNode ->
+            ( { model | moneroNode = model.customMoneroNode, customMoneroNode = "" }, Cmd.none )
+
+        -- Ledger handlers
+        ConnectLedger ->
+            ( { model | ledgerConnecting = True, ledgerError = "" }, Cmd.none )
+
+        LedgerConnected ->
+            ( { model | ledgerConnected = True, ledgerConnecting = False }, Cmd.none )
+
+        LedgerDisconnected ->
+            ( { model | ledgerConnected = False, ledgerConnecting = False, ledgerError = "" }, Cmd.none )
+
+        LedgerConnectionFailed errMsg ->
+            ( { model | ledgerConnecting = False, ledgerError = errMsg }, Cmd.none )
+
+        DisconnectLedger ->
+            ( { model | ledgerConnected = False, ledgerConnecting = False, ledgerError = "" }, Cmd.none )
+
+        RequestLedgerAddress ->
+            ( model, Cmd.none )
+
+        LedgerAddressReceived address ->
+            ( { model | primaryaddress = address }, Cmd.none )
+
+
+
+-- NAV: View
+
+
+view : Model -> Html Msg
+view model =
+    div [ class "funds-container" ]
+        [ h1 [ class "funds-title" ] [ text "Connection Management" ]
+        , h2 [ class "funds-title" ] [ text "Here you can resolve wallet, Haveno, and Ledger connection issues." ]
+
+        -- Ledger Hardware Wallet Status
+        , div [ class "ledger-section", style "margin-bottom" "1.5em" ]
+            [ h3 [] [ text "Ledger Nano X Hardware Wallet" ]
+            , if not model.ledgerConnected then
+                div []
+                    [ p [ id "ledgerNotConnected" ] [ text "Ledger not connected." ]
+                    , if model.ledgerConnecting then
+                        p [ style "color" "#0077cc" ] [ text "Connecting to Ledger... Check your device." ]
+                      else
+                        text ""
+                    , if model.ledgerError /= "" then
+                        p [ style "color" "red" ] [ text ("Error: " ++ model.ledgerError) ]
+                      else
+                        text ""
+                    , p []
+                        [ button
+                            [ class "info-button"
+                            , id "connectLedgerButton"
+                            , onClick ConnectLedger
+                            ]
+                            [ text "Connect Ledger" ]
+                        ]
+                    ]
+              else
+                div []
+                    [ p [ id "ledgerConnected", style "color" "green" ] [ text "Ledger Connected" ]
+                    , p []
+                        [ button
+                            [ class "info-button"
+                            , id "getLedgerAddressButton"
+                            , onClick RequestLedgerAddress
+                            ]
+                            [ text "Get Address from Ledger" ]
+                        ]
+                    , p []
+                        [ button
+                            [ class "info-button"
+                            , id "disconnectLedgerButton"
+                            , onClick DisconnectLedger
+                            ]
+                            [ text "Disconnect Ledger" ]
+                        ]
+                    ]
+            ]
+
+        -- Monero Wallet Status
+        , if not model.walletConnected then
+            div []
+                [ p [ id "walletNotConnectedWarning" ] [ text "Monero Wallet not connected." ]
+                , p []
+                    [ button [ class "info-button", id "retryWalletConnectionButton", onClick <| RetryWalletConnection (Err <| Grpc.UnknownGrpcStatus "") ] [ text "Retry Monero Wallet Connection" ] ]
+                , p [] [ text "Current Monero Node:" ]
+                , p [ class "current-node" ] [ text model.moneroNode ]
+                ]
+
+          else
+            p [ id "walletNotConnectedWarning" ] [ text "" ]
+
+        -- Input & Custom Monero Node (does not depend on gRPC)
+        , div []
+            [ p [] [ text "Enter a custom Monero node:" ]
+            , input
+                [ placeholder "Custom Monero Node"
+                , onInput SetCustomMoneroNode
+                , Html.Attributes.value model.customMoneroNode
+                ]
+                []
+            , p [] [ Utils.MyUtils.infoBtn "Use Custom Node" "retryHavenoConnectionButton" <| ApplyCustomMoneroNode ]
+            ]
+
+        -- Haveno Node Status
+        , if not model.havenoConnected then
+            div []
+                [ p [ id "havenoNodeNotConnected" ] [ text "Haveno Node not connected." ]
+                , p [] [ Utils.MyUtils.infoBtn "Retry Haveno Connection" "retryHavenoConnectionButton" <| RetryHavenoConnection ]
+                ]
+
+          else
+            text ""
+        ]
+
+
+
+-- NAV: View helpers:
+{- custodialFundsView : Model -> Html Msg
+   custodialFundsView model =
+       Html.div [ class "funds-container", id "custodialFundsView" ]
+           [ Html.h1 [ class "funds-title" ] [ Html.text "Funds" ]
+           , primaryAddressView model
+           , xmrBalView model
+           , Html.div [ id "btcbalance", class "balance-text" ]
+               [ Html.text ("Available BTC Balance: " ++ btcBalanceAsString model.balances ++ " BTC") ]
+           , Html.div [ id "reservedOfferBalance", class "balance-text" ]
+               [ Html.text ("Reserved Offer Balance: " ++ reservedOfferBalanceAsString model.balances ++ " XMR") ]
+           , MyUtils.infoBtn "New Sub Address" <| ClickedGotNewSubaddress
+           ]
+-}

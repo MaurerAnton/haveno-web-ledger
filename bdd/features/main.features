@@ -1,0 +1,110 @@
+### **Feature: MVP Mobile Tor-Based Haveno Web App**
+Gherkin/BDD scenarios describing the behavior of a mobile Tor-based web app that communicates with a Haveno daemon via HTTPS to handle hardware Splash transactions. The app will use the hardware Splash as the sole form of identity, and no additional authorization is required.
+
+Main is for functionality that persists across all pages (e.g. Dis/Connected indicator)
+
+-- NOTE: For simplicity, 'And' and 'Then' are just 'When' in the code
+
+#### **Background:**
+**Given** the user has a mobile device with the Tor Browser installed
+**And**  there is an HTTPS server running a Haveno daemon configured for securely handling transactions
+**And**  the Haveno-Web app is launched and connected to the Internet
+
+#### **Scenario 1: Display successful API connection status**
+
+**Given** the app is initialized
+**When** the application attempts to connect with the Haveno API
+**Then** it should display a message indicating whether the connection to the Haveno API was successful
+
+#### **Scenario 2: Display unsuccessful API connection status**
+
+**Given** the application attempts to connect with the Haveno API
+**Then** it should display a message indicating that the connection to the Haveno API was unsuccessful
+
+#### **Scenario 3: Display the Haveno core app version number"**
+
+**Given** the user accesses the Splash page
+**When** the application successfully connects with the Haveno API
+**And** it displays Haveno version number on the Splash page
+**And** it displays Haveno version number in the footer"
+**And** it should ensure the navigation menu is enabled
+
+
+#### **Scenario 3: Fetching an XMR address from the Haveno daemon - success**
+
+**Given** the user accesses the Splash page
+**And** it should display the primary xmraddress
+**And** it should display the Splash page
+**And** it should ensure the navigation menu is enabled
+
+#### **Scenario 5b: Fetching an XMR address from the Haveno daemon - failure**
+
+**Given** the user accesses the Splash page
+**And** there is an error retrieving the primary xmraddress
+**Then** it should display the 'XMR Splash Not Connected' indicator in red
+**And** it should ensure the navigation menu is disabled
+ 
+
+#### **Scenario 6: Show a message that the Haveno core app is not yet connected**  
+
+**Given** the web app is opened
+**When** the app is unable to connect to Haveno
+**Then** the app location should be root
+**And** the footer should display "No Haveno version available"  
+**And** the Splash page should be displayed  
+**And** the model should reflect the current page as the Splash page
+**And** it should ensure the navigation menu is disabled
+  
+
+#### **Scenario 7: Show the Haveno core app version in the footer**  
+
+**Given** the web app is opened 
+**And** the Monero wallet address is retrieved from Haveno
+**Then** the app location should be root 
+**And** the Splash page should be displayed  
+**And** the model should reflect the current page as the Splash page  
+**And** the footer should display the version number "1.0.7"
+**And** it should ensure the navigation menu is enabled
+
+#### **Scenario 11: Menu Closes After Using NavLink**
+
+**Given** the application is initialized
+**When** the user opens the menu
+**And** the user clicks the Funds navLink in the menu
+**And** the application should be on the Funds page
+**And** the menu should be closed
+
+
+#### **Scenario 13: Checking the Menu Nav Links Work**
+
+**Given** the application is initialized
+**And** the user uses the menu to navigate to the Splash page
+**When** the user clicks the Sell navLink in the menu
+**Then** it should be possible to use the Menu
+**And** the application should be on the Sell page
+**And** the menu should be displayed
+
+#### **Scenario 14: Checking the Splash Page Initialization After Using NavLink to Splash**
+
+**Given** the application is initialized
+**And** the app returns a valid XMR address
+**And** the user navigates to another navLink in the menu
+**When** the user clicks the Splash navLink in the menu
+**Then** it should be possible to use the Menu
+**And** the menu should be displayed
+**And** the application should be on the Splash page with an updated initial Splash model
+**And** the available balance should be displayed correctly
+**And** the reserved balance should be displayed correctly
+**And** the current address from the Splash page model should be displayed
+
+
+
+
+
+
+
+### **Summary**
+
+These scenarios outline the critical interactions between the mobile Chrome-based web app and the API leveraging a Haveno daemon. 
+The scenarios cover essential functions like accessing the web app, connecting hardware Splashs, initiating and handling transactions, and ensuring secure communication.
+

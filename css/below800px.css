@@ -1,0 +1,73 @@
+@media (max-width: 800px) {
+ 
+
+  .topLogo {
+    max-width: 100px;
+    height: auto;
+    width: 100%;
+  }
+
+  .address-text {
+    word-wrap: break-word;  /* Ensures long words wrap */
+    overflow-wrap: break-word;
+    white-space: normal;  /* Allows text to wrap normally */
+  }
+
+  .dashboard-panel {
+    width: 100%; /* Make the panel take up the full width */
+    height: auto; /* Allow the height to adjust based on content */
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap; /* Allow wrapping of sections */
+    justify-content: space-between; /* Add space between sections */
+  }
+
+  .dashboard-section {
+    flex: 1 1 45%; /* Make sections take up 45% of the width */
+    margin-right: 5px; /* Add right margin for spacing */
+    margin-bottom: 5px; /* Add bottom margin for spacing */
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
+  }
+
+  .large-text {
+    font-size: 0.5em; /* Reduced font size by another 50% */
+  }
+
+  .small-text {
+    font-size: 0.35em; /* Reduced font size by another 50% */
+  }
+
+
+
+.table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-scroll-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+
+table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+th, td {
+  padding: 8px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+
+
+
+
+
+}

@@ -1,0 +1,87 @@
+### **Feature: Ledger Nano X Hardware Wallet Integration**
+
+Mobile Tor-based web app communicates with Ledger Nano X via WebUSB.
+The Ledger serves as the sole hardware-based identity provider — no additional authorization required.
+
+---
+
+#### **Background:**
+**Given** the user has a mobile device with the Tor Browser installed
+**And** a Ledger Nano X hardware wallet is connected via USB
+**And** the Monero app is open on the Ledger device
+**And** the Haveno-Web app is launched and connected to the Internet
+**And** the Tor Browser has WebUSB enabled
+
+---
+
+#### **Scenario 1: Detect and connect to Ledger Nano X**
+
+**Given** the application is initialized
+**When** the user initiates a Ledger connection from the Connect page
+**Then** the browser shows a WebUSB device picker
+**And** the user selects their Ledger Nano X
+**And** the application displays "Ledger Connected" status
+
+---
+
+#### **Scenario 2: Retrieve public Monero address from Ledger**
+
+**Given** the Ledger is connected
+**When** the application requests the public wallet address
+**Then** the Ledger returns the view public key (32 bytes) and spend public key (32 bytes)
+**And** the primary Monero address is displayed on the Funds page
+
+---
+
+#### **Scenario 3: Initiate and sign a Monero transaction via Ledger**
+
+**Given** the Ledger is connected and unlocked
+**And** a transaction request is constructed with valid inputs/outputs
+**When** the application sends the signing request to the Ledger
+**Then** the Ledger opens a transaction session (INS_OPEN_TX 0x70)
+**And** the Ledger processes stealth address data (INS_STEALTH 0x76)
+**And** the Ledger signs with CLSAG (INS_CLSAG 0x7F)
+**And** the Ledger closes the transaction (INS_CLOSE_TX 0x80)
+**And** the signed transaction output is returned to the browser
+**And** a success message "Transaction signed on Ledger" is displayed
+
+---
+
+#### **Scenario 4: User rejects transaction on Ledger**
+
+**Given** the Ledger is connected
+**When** a signing request is sent to the Ledger
+**And** the user rejects the transaction on the Ledger device
+**Then** the Ledger returns SW_DENY (0x6982)
+**And** the application displays "Transaction rejected on device"
+**And** no transaction data is broadcast
+
+---
+
+#### **Scenario 5: Ledger app version incompatible**
+
+**Given** the Ledger is connected
+**When** the application attempts a protocol exchange
+**And** the Monero app on the Ledger is too old
+**Then** the Ledger returns SW_CLIENT_NOT_SUPPORTED (0x6D01)
+**And** the application displays "Update Monero Ledger App required"
+
+---
+
+#### **Scenario 6: Ledger disconnected mid-operation**
+
+**Given** the Ledger is connected
+**When** the user unplugs the Ledger during transaction signing
+**Then** the WebUSB connection is lost
+**And** the application displays "Ledger disconnected — operation aborted"
+**And** the user is prompted to reconnect
+
+---
+
+#### **Scenario 7: Display Monero address on Ledger screen**
+
+**Given** the Ledger is connected
+**When** the user requests to verify their address on the Ledger screen
+**Then** the application sends INS_DISPLAY_ADDRESS (0x21)
+**And** the Monero primary address is shown on the Ledger screen
+**And** the user can confirm or reject the address match
