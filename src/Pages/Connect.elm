@@ -2,7 +2,7 @@ module Pages.Connect exposing (Model, Msg(..), init, initialModel, update, view)
 
 import Comms.CustomGrpc exposing (gotPrimaryAddress)
 import Grpc
-import Html exposing (Html, button, div, h1, h2, input, p, text, span)
+import Html exposing (Html, button, div, h1, h2, h3, input, p, text, span)
 import Html.Attributes exposing (class, id, placeholder, style)
 import Html.Events exposing (onClick, onInput)
 import Proto.Io.Haveno.Protobuffer as Protobuf
